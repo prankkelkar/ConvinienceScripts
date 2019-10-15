@@ -70,7 +70,7 @@ function cleanup() {
 function install_ruby() {
     # Install ruby
     printf -- "Installing ruby... \n"
-    wget $RUBY_INSTALL_URL && sudo bash build_ruby.sh -y
+    wget $RUBY_INSTALL_URL && bash build_ruby.sh -y
 
     export GEM_HOME=/home/$USER/.gem/ruby
     export PATH=/home/$USER/.gem/ruby/bin:$PATH
