@@ -69,9 +69,9 @@ function cleanup() {
 
 function install_ruby() {
     # Install ruby
-    printf -- "Installing ruby... \n"
+    printf -- "Installing ruby... \n" |& tee -a "$LOG_FILE"
     wget $RUBY_INSTALL_URL && bash build_ruby.sh -y
-
+    printf -- "Installed Ruby successfully \n" |& tee -a "$LOG_FILE"
     export GEM_HOME=/home/$USER/.gem/ruby
     export PATH=/home/$USER/.gem/ruby/bin:$PATH
     echo $PATH
@@ -88,9 +88,6 @@ function configureAndInstall() {
     else
         printf -- "Install gems \n"
         #Download fluentd
-	source $HOME/.bashrc
-	export GEM_HOME=/home/$USER/.gem/ruby
-    	export PATH=/home/$USER/.gem/ruby/bin:$PATH
         export PATH="$PATH:/usr/local/bin"
         #Install gems
         gem install ${PACKAGE_NAME} -v ${PACKAGE_VERSION}
@@ -174,14 +171,14 @@ case "$DISTRO" in
     printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
     printf -- "Installing dependencies... it may take some time.\n"
     sudo yum install -y  wget |& tee -a "$LOG_FILE"
-    install_ruby |& tee -a "$LOG_FILE"
+    install_ruby
     configureAndInstall |& tee -a "$LOG_FILE"
     ;;
 "sles-12.4" | "sles-15" | "sles-15.1")
     printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
     printf -- "Installing dependencies... it may take some time.\n"
     sudo zypper install -y wget |& tee -a "$LOG_FILE"
-    install_ruby |& tee -a "$LOG_FILE"
+    install_ruby
     configureAndInstall |& tee -a "$LOG_FILE"
     ;;
 *)
