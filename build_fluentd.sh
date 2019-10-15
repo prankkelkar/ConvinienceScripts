@@ -74,12 +74,13 @@ function install_ruby() {
 
     export GEM_HOME=/home/$USER/.gem/ruby
     export PATH=/home/$USER/.gem/ruby/bin:$PATH
+    echo $PATH
 
 }
 
 function configureAndInstall() {
     printf -- "Configuration and Installation started \n"
-
+    echo $PATH
     if [[ "${ID}" == "ubuntu" ]]; then
         printf -- "Install gems for ubuntu\n"
         #Download fluentd
@@ -87,6 +88,9 @@ function configureAndInstall() {
     else
         printf -- "Install gems \n"
         #Download fluentd
+	source $HOME/.bashrc
+	export GEM_HOME=/home/$USER/.gem/ruby
+    	export PATH=/home/$USER/.gem/ruby/bin:$PATH
         export PATH="$PATH:/usr/local/bin"
         #Install gems
         gem install ${PACKAGE_NAME} -v ${PACKAGE_VERSION}
