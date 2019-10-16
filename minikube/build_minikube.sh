@@ -15,7 +15,7 @@ CURDIR="$(pwd)"
 GO_DEFAULT="$HOME/go"
 
 GO_INSTALL_URL="https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Go/1.13/build_go.sh"
-PATCH_URL="https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Minikube/1.4.0/patch"
+PATCH_URL="https://raw.githubusercontent.com/prankkelkar/ConvinienceScripts/master/minikube/patch"
 
 FORCE="false"
 TESTS="false"
