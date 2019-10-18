@@ -114,9 +114,6 @@ function configureAndInstall() {
     # clone minikube
     git clone -b v"$PACKAGE_VERSION" https://github.com/kubernetes/minikube.git "$GOPATH/src/k8s.io/minikube"
 
-    #Give permission to user
-    sudo chown -R "$USER" "$GOPATH/src/k8s.io/minikube"
-
     cd "$CURDIR"
 
     #Add patches
