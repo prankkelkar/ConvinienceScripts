@@ -236,7 +236,7 @@ case "$DISTRO" in
     configureAndInstall | tee -a "$LOG_FILE"
     ;;
 
-"rhel-7.5" | "rhel-7.6" | "rhel-7.7" | "rh-8.0")
+"rhel-7.5" | "rhel-7.6" | "rhel-7.7" | "rhel-8.0")
     printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" | tee -a "$LOG_FILE"
     printf -- '\nInstalling dependencies \n' | tee -a "$LOG_FILE"
     yum install -y autoconf automake c-ares curl elfutils-libelf elfutils-libelf-devel gcc gcc-c++ glibc glibc-devel libcurl-devel libstdc++ libstdc++-devel libtool libyaml-devel make patch pkgconfig readline-devel rpm-build sudo vim wget zlib-devel kernel-$(uname -r) kernel-devel-$(uname -r) kernel-headers-$(uname -r)
