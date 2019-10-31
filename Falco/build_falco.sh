@@ -147,7 +147,7 @@ function configureAndInstall() {
     printf -- '\nFalco build completed successfully. \n'
 
     printf -- '\nInserting Falco kernel module. \n'
-    rmmod falco_probe
+    rmmod falco_probe || true
     cd $SOURCE_ROOT/falco/build/release 
     insmod driver/falco-probe.ko
     printf -- '\nInserted falco kernel module successfully. \n'
