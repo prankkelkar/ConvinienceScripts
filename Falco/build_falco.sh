@@ -3,8 +3,8 @@
 # LICENSE: Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
 #
 # Instructions:
-# Download build script: wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Minikube/1.4.0/build_minikube.sh
-# Execute build script: bash build_minikube.sh    (provide -h for help)
+# Download build script: wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Falco/0.17.1/build_falco.sh
+# Execute build script: bash build_falco.sh    (provide -h for help)
 
 set -e -o pipefail
 
@@ -13,8 +13,7 @@ PACKAGE_VERSION="0.17.1"
 
 SOURCE_ROOT="$(pwd)"
 
-GO_INSTALL_URL="https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Go/1.13/build_go.sh"
-PATCH_URL="https://raw.githubusercontent.com/prankkelkar/ConvinienceScripts/master/minikube/patch"
+PATCH_URL="https://raw.githubusercontent.com/prankkelkar/ConvinienceScripts/falco/Falco/patch/"
 TEST_USER="$(whoami)"
 FORCE="false"
 TESTS="false"
@@ -64,34 +63,7 @@ function prepare() {
 
 function cleanup() {
 
-    rm -rf "${SOURCE_ROOT}/io-threads.h.diff"
-
-    #for rhel
-    if [[ "${ID}" == "rhel" ]]; then
-        rm -rf "${SOURCE_ROOT}/userspace-rcu"
-        rm -rf "${SOURCE_ROOT}/thin-provisioning-tools"
-    fi
-
-    if [[ "${TESTS}" == "true" ]]; then
-
-        if [[ "${ID}" == "rhel" ]]; then
-            rm -rf "${SOURCE_ROOT}/dbench"
-            if [[ "${ID}" == "sles" ]]; then
-                rm -rf "${SOURCE_ROOT}/yajl"
-            fi
-        fi
-
-        #cleaning patches
-        rm -rf "${SOURCE_ROOT}/throttle-rebal.t.diff"
-        rm -rf "${SOURCE_ROOT}/mount-nfs-auth.t.diff"
-        rm -rf "${SOURCE_ROOT}/bug-847622.t.diff"
-        rm -rf "${SOURCE_ROOT}/bug-1161311.t.diff"
-        rm -rf "${SOURCE_ROOT}/bug-1193636.t.diff"
-
-        if [[ "${DISTRO}" == "sles-12.3" || "${DISTRO}" == "ubuntu-16.04" ]]; then
-            rm -rf "${SOURCE_ROOT}/run-tests.sh.diff"
-        fi
-    fi
+    
     printf -- '\nCleaned up the artifacts\n'
 }
 
