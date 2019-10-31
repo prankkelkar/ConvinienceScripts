@@ -11,7 +11,7 @@ set -e -o pipefail
 PACKAGE_NAME="falco"
 PACKAGE_VERSION="0.17.1"
 
-SOURCE_ROOT="$(pwd)"
+export SOURCE_ROOT="$(pwd)"
 
 PATCH_URL="https://raw.githubusercontent.com/prankkelkar/ConvinienceScripts/falco/Falco/patch/"
 TEST_USER="$(whoami)"
