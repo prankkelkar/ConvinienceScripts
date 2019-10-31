@@ -117,7 +117,7 @@ function configureAndInstall() {
     git checkout 0.26.4
     #Apply the patch
     curl -o scap_fds.c.patch $PATCH_URL/scap_fds.c.patch
-    patch -l $SOURCE_ROOT/falco/userspace/libscap/scap_fds.c scap_fds.c.patch
+    patch -l $SOURCE_ROOT/sysdig/userspace/libscap/scap_fds.c scap_fds.c.patch
 
     printf -- '\nSysdig configuration is complete. \n'
 
