@@ -111,12 +111,12 @@ function configureAndInstall() {
     printf -- '\nDownloading sysdig. \n'
     cd $SOURCE_ROOT
     #fetch protobuf patch. This is later used in make process
-    curl -o protobuf-3.5.0.patch $REPO_URL/protobuf-3.5.0.patch
+    curl -o protobuf-3.5.0.patch $PATCH_URL/protobuf-3.5.0.patch
     git clone https://github.com/draios/sysdig.git
     cd sysdig
     git checkout 0.26.4
     #Apply the patch
-    curl -o scap_fds.c.patch $REPO_URL/scap_fds.c.patch
+    curl -o scap_fds.c.patch $PATCH_URL/scap_fds.c.patch
     patch -l $SOURCE_ROOT/falco/userspace/libscap/scap_fds.c scap_fds.c.patch
 
     printf -- '\nSysdig configuration is complete. \n'
@@ -126,11 +126,11 @@ function configureAndInstall() {
     git clone https://github.com/falcosecurity/falco.git
     cd falco
     git checkout 0.17.1
-    curl -o falco.patch $REPO_URL/falco.patch
+    curl -o falco.patch $PATCH_URL/falco.patch
     git apply falco.patch
 
     if [[ "${ID}" == "rhel" ]]; then
-        curl -o CMakeLists.txt.patch $REPO_URL/CMakeLists.txt.patch
+        curl -o CMakeLists.txt.patch $PATCH_URL/CMakeLists.txt.patch
         patch -l CMakeLists.txt CMakeLists.txt.patch
     fi
 
