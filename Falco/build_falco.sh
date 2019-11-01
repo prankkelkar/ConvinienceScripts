@@ -63,7 +63,11 @@ function prepare() {
 
 function cleanup() {
 
-    
+    rm -rf "${SOURCE_ROOT}/protobuf-3.5.0.patch"
+    if [[ "${ID}" == "rhel" ]]; then
+        rm -rf "${SOURCE_ROOT}/cmake-3.7.2.tar.gz"
+        rm -rf "${SOURCE_ROOT}/lua-5.1.tar.gz"
+    fi
     printf -- '\nCleaned up the artifacts\n'
 }
 
