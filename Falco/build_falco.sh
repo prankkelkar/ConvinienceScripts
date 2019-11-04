@@ -142,7 +142,7 @@ function configureAndInstall() {
     mkdir -p $SOURCE_ROOT/falco/build/release 
     cd $SOURCE_ROOT/falco/build/release 
     cmake -DUSE_BUNDLED_LUAJIT=false -DFALCO_VERSION=0.17.1 -DCMAKE_VERBOSE_MAKEFILE=On ../../
-    if [[ "${VERSION_ID}" != "18.04" ]]; then
+    if [ "${ID}" == "rhel" ] || [ "${ID}" == "sles" ] || [ ${VERSION_ID} == "16.04" ]; then
         make catch2 #Only for RHEL and ubuntu 16.04
     fi
     make
@@ -232,7 +232,7 @@ prepare
 
 DISTRO="$ID-$VERSION_ID"
 case "$DISTRO" in
-"ubuntu-16.04" | "ubuntu-18.04")
+"ubuntu-16.04" | "ubuntu-18.04" | "ubuntu-19.04" | "ubuntu-19.10")
     printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" | tee -a "$LOG_FILE"
     printf -- '\nInstalling dependencies \n' | tee -a "$LOG_FILE"
     apt-get update
