@@ -3,13 +3,13 @@
 # LICENSE: Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
 #
 # Instructions:
-# Download build script: wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Falco/0.17.1/build_falco.sh
+# Download build script: wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Falco/0.18.0/build_falco.sh
 # Execute build script: bash build_falco.sh    (provide -h for help)
 
 set -e -o pipefail
 
 PACKAGE_NAME="falco"
-PACKAGE_VERSION="0.17.1"
+PACKAGE_VERSION="0.18.0"
 
 export SOURCE_ROOT="$(pwd)"
 
@@ -118,7 +118,7 @@ function configureAndInstall() {
     curl -o protobuf-3.5.0.patch $PATCH_URL/protobuf-3.5.0.patch
     git clone https://github.com/draios/sysdig.git
     cd sysdig
-    git checkout 0.26.4
+    git checkout falco/0.18.0
     #Apply the patch
     curl -o scap_fds.c.patch $PATCH_URL/scap_fds.c.patch
     patch -l $SOURCE_ROOT/sysdig/userspace/libscap/scap_fds.c scap_fds.c.patch
@@ -129,7 +129,7 @@ function configureAndInstall() {
     cd $SOURCE_ROOT
     git clone https://github.com/falcosecurity/falco.git
     cd falco
-    git checkout 0.17.1
+    git checkout 0.18.0
     curl -o falco.patch $PATCH_URL/falco.patch
     git apply falco.patch
 
@@ -141,10 +141,7 @@ function configureAndInstall() {
     printf -- '\nStarting falco build. \n'
     mkdir -p $SOURCE_ROOT/falco/build/release 
     cd $SOURCE_ROOT/falco/build/release 
-    cmake -DUSE_BUNDLED_LUAJIT=false -DFALCO_VERSION=0.17.1 -DCMAKE_VERBOSE_MAKEFILE=On ../../
-    if [[ "${VERSION_ID}" != "18.04" ]]; then
-        make catch2 #Only for RHEL and ubuntu 16.04
-    fi
+    cmake -DUSE_BUNDLED_LUAJIT=false -DFALCO_VERSION=0.18.0 -DCMAKE_VERBOSE_MAKEFILE=On ../../
     make
     make package
     make install
