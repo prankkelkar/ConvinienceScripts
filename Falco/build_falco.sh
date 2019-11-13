@@ -201,7 +201,7 @@ while getopts "h?dyt" opt; do
         ;;
     t)
         if command -v "$PACKAGE_NAME" >/dev/null; then
-            printf -- "%s is detected with version %s .\n" "$PACKAGE_NAME" "$PACKAGE_VERSION" | tee -a "$LOG_FILE"
+            printf -- "%s is detected in the system. Skipping build and running tests .\n" "$PACKAGE_NAME" | tee -a "$LOG_FILE"
             TESTS="true"
             runTest
             exit 0
