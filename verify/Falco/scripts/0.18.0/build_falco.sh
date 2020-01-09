@@ -13,7 +13,7 @@ PACKAGE_VERSION="0.18.0"
 
 export SOURCE_ROOT="$(pwd)"
 
-PATCH_URL="https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Falco/0.18.0/patch/"
+PATCH_URL="https://raw.githubusercontent.com/prankkelkar/ConvinienceScripts/falco/verify/Falco/scripts/0.18.0/patch/"
 TEST_USER="$(whoami)"
 FORCE="false"
 FORCE_LUAJIT="false"
