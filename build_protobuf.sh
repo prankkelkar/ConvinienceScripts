@@ -214,7 +214,7 @@ case "$DISTRO" in
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 
 	if [[ "$DISTRO" == "rhel-8.0" || "$DISTRO" == "rhel-8.1" ]]; then
-		sudo yum install -y  autoconf automake bzip2 gcc-c++ git gzip libtool make tar wget zlib-devel |& tee -a "$LOG_FILE"
+		sudo yum install -y  autoconf automake bzip2 diffutils gcc-c++ git gzip libtool make tar wget zlib-devel |& tee -a "$LOG_FILE"
 	else
 		sudo yum install -y  autoconf automake gcc-c++ git gzip libtool make |& tee -a "$LOG_FILE"
 	fi
