@@ -160,12 +160,12 @@ case "$DISTRO" in
     configureAndInstall |& tee -a "$LOG_FILE"
 	;;
 
-"rhel-7.5" | "rhel-7.6" | "rhel-7.7" | "rhel-8.0")
+"rhel-7.5" | "rhel-7.6" | "rhel-7.7" | "rhel-8.0" | "rhel-8.1")
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- 'Installing the dependencies for postgresql from repository \n' |& tee -a "$LOG_FILE"
 
-	if [[ "$ID" == "rhel" && "$VERSION_ID" == "8.0" ]]; then	
-	sudo yum install -y git wget gcc gcc-c++ make readline-devel zlib-devel bison flex  glibc-langpack-en procps-ng diffutils |& tee -a "$LOG_FILE"
+	if [[ "$VERSION_ID" == "8.0" || "$VERSION_ID" == "8.1" ]]; then	
+	sudo yum install -y git wget gcc gcc-c++ make readline-devel zlib-devel bison flex glibc-langpack-en procps-ng diffutils |& tee -a "$LOG_FILE"
 	else
 	sudo yum install -y git wget build-essential gcc gcc-c++ make readline-devel zlib-devel bison flex |& tee -a "$LOG_FILE"
 	fi
