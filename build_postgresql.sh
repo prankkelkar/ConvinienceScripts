@@ -53,7 +53,7 @@ function checkPrequisites() {
 }
 
 function cleanup() {
-	printf -- 'No artifacts to be cleaned.\n'
+	rm -rf "${CURDIR}/postgresql-${PACKAGE_VERSION}.tar.gz"
 }
 
 function runTest() {
@@ -77,7 +77,7 @@ function configureAndInstall() {
 			printf -- 'Detected Postgres user in the system. Using the same\n'
 	else
 			printf -- 'Creating postgres user. \n'
-			sudo useradd postgres
+			sudo useradd postgres -m -U
 			sudo passwd postgres
 	fi
 
