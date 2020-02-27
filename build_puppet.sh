@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# © Copyright IBM Corporation 2019, 2020.
+# © Copyright IBM Corporation 2020.
 # LICENSE: Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
 #
 # Instructions:
@@ -19,6 +19,7 @@ JFFI_VERSION="1.2.19"
 JRUBY_VERSION="9.2.8.0"
 FORCE="false"
 LOG_FILE="$CURDIR/logs/${PACKAGE_NAME}-${PACKAGE_VERSION}-$(date +"%F-%T").log"
+PUPPET_CONFIG_URL="https://raw.githubusercontent.com/prankkelkar/ConvinienceScripts/master/puppet.conf"
 
 trap cleanup 0 1 2 ERR
 
@@ -65,10 +66,11 @@ function checkPrequisites() {
 
 function cleanup() {
 
-	if [[ -f "ruby"-${RUBY_VERSION}.tar.gz ]]; then
-		sudo rm "ruby"-${RUBY_VERSION}.tar.gz
-		printf -- 'Cleaned up the artifacts\n' >>"$LOG_FILE"
-	fi
+    rm -rf "${CURDIR}/META-INF"
+    rm -rf "${CURDIR}/std.jar"
+    rm -rf "ruby-${RUBY_FULL_VERSION}.tar.gz"
+    rm -rf "OpenJDK8U-jdk_s390x_linux_hotspot_8u242b08.tar.gz"
+
 }
 
 function configureAndInstall() {
@@ -144,7 +146,9 @@ function configureAndInstall() {
 		mkdir "$confdir"/modules
 		mkdir "$confdir"/manifests
 		cd "$confdir"
-		touch puppet.conf
+		#Remove default config file
+        rm -rf "$confdir/puppet.conf"
+        wget "$PUPPET_CONFIG_URL"
 		wget https://raw.githubusercontent.com/puppetlabs/puppet/master/conf/auth.conf
 		mkdir -p "$confdir"/opt/puppetlabs/puppet
 		mkdir -p "$confdir"/var/log/puppetlabs
@@ -156,7 +160,6 @@ function configureAndInstall() {
 		cp META-INF/jruby.home/lib/ruby/stdlib/ffi/platform/powerpc-aix/platform.conf META-INF/jruby.home/lib/ruby/stdlib/ffi/platform/s390x-linux/
 		zip -qr std.jar META-INF
 		cp std.jar ~/.m2/repository/org/jruby/jruby-stdlib/$JRUBY_VERSION/jruby-stdlib-$JRUBY_VERSION.jar
-		rm -rf META-INF std.jar
 
 		printf -- 'Completed Puppet server setup \n'
 
@@ -233,7 +236,7 @@ done
 
 function gettingStarted() {
 	printf -- "Puppet installed successfully. \n"
-	printf -- "     To run Puppet server, please follow from step 2.8 in build instructions.\n"
+	printf -- "     To run Puppet server, please follow from step 2.9 in build instructions.\n"
 	printf -- "     To run Puppet agent, please follow from step 3.7 in build instructions.\n"
 	printf -- "More information can be found here : https://puppetlabs.com/\n"
 	printf -- '\n'
