@@ -9,6 +9,7 @@
 set -e -o pipefail
 
 CURDIR="$(pwd)"
+FULL_HOSTNAME="$(hostname -f)"
 PACKAGE_NAME="Puppet"
 PACKAGE_VERSION="6.13.0"
 SERVER_VERSION="6.9.0"
@@ -148,7 +149,8 @@ function configureAndInstall() {
 		cd "$confdir"
 		#Remove default config file
         rm -rf "$confdir/puppet.conf"
-        wget "$PUPPET_CONFIG_URL"
+        wget "$PUPPET_CONFIG_URL" 
+        sed -i "s/server.myhost.com/$FULL_HOSTNAME/g" "$confdir/puppet.conf"
 		wget https://raw.githubusercontent.com/puppetlabs/puppet/master/conf/auth.conf
 		mkdir -p "$confdir"/opt/puppetlabs/puppet
 		mkdir -p "$confdir"/var/log/puppetlabs
@@ -235,6 +237,13 @@ while getopts "h?dy?s:" opt; do
 done
 
 function gettingStarted() {
+    if [ "$USEAS" = "server" ]; then
+        printf -- "Puppet server is installed successfully. \n"
+        printf -- "To run Puppet server, please follow from step 2.9 from build instructions. \n"
+    else
+        printf -- "Puppet agent is installed successfully. \n"
+        printf -- "Follow step  \n"
+    fi
 	printf -- "Puppet installed successfully. \n"
 	printf -- "     To run Puppet server, please follow from step 2.9 in build instructions.\n"
 	printf -- "     To run Puppet agent, please follow from step 3.7 in build instructions.\n"
