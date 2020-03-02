@@ -252,7 +252,7 @@ case "$DISTRO" in
 	printf -- "Installing the dependencies for $PACKAGE_NAME from repository \n" |& tee -a "$LOG_FILE"
 	sudo apt-get update >/dev/null
 	if [ "$USEAS" = "server" ]; then
-		sudo apt-get install -y wget zip unzip tar git g++ make rake libreadline6 libreadline6-dev openssl libyaml-dev libssl-dev libsqlite3-dev libc6-dev cron locales ant zip |& tee -a "$LOG_FILE"
+		sudo apt-get install -y locales locales-all wget zip unzip tar git g++ make rake libreadline6 libreadline6-dev openssl libyaml-dev libssl-dev libsqlite3-dev libc6-dev cron locales ant zip |& tee -a "$LOG_FILE"
 	elif [ "$USEAS" = "agent" ]; then
 		sudo apt-get install -y g++ tar make wget openssl libssl-dev |& tee -a "$LOG_FILE"
 	else
@@ -267,7 +267,7 @@ case "$DISTRO" in
 	printf -- "Installing the dependencies for $PACKAGE_NAME from repository \n" |& tee -a "$LOG_FILE"
 	sudo apt-get update >/dev/null
 	if [ "$USEAS" = "server" ]; then
-		sudo apt-get install -y g++ libreadline7 libreadline-dev tar make git wget libsqlite3-dev libc6-dev cron locales unzip libyaml-dev zlibc zlib1g-dev zlib1g libxml2-dev libgdbm-dev openssl1.0 libssl1.0-dev ruby ruby-dev ant zip  |& tee -a "$LOG_FILE"
+		sudo apt-get install -y locales locales-all g++ libreadline7 libreadline-dev tar make git wget libsqlite3-dev libc6-dev cron locales unzip libyaml-dev zlibc zlib1g-dev zlib1g libxml2-dev libgdbm-dev openssl1.0 libssl1.0-dev ruby ruby-dev ant zip  |& tee -a "$LOG_FILE"
 	elif [ "$USEAS" = "agent" ]; then
 		sudo apt-get install -y g++ tar make wget openssl1.0 libssl1.0-dev ruby ruby-dev |& tee -a "$LOG_FILE"
 	else
