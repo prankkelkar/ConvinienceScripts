@@ -239,14 +239,14 @@ done
 function gettingStarted() {
     if [ "$USEAS" = "server" ]; then
         printf -- "Puppet server is installed successfully. \n"
-        printf -- "To run Puppet server, please follow from step 2.9 from build instructions. \n"
+        printf -- "To run Puppet server, please follow step 2.9 from build instructions. \n"
     else
         printf -- "Puppet agent is installed successfully. \n"
-        printf -- "Follow step  \n"
+        printf -- "set confdir variable with following command.  \n"
+        printf -- "     export confdir=`puppet agent --configprint confdir` \n"
+        printf -- "Continue with step 3.7 from build instructions\n"
     fi
-	printf -- "Puppet installed successfully. \n"
-	printf -- "     To run Puppet server, please follow from step 2.9 in build instructions.\n"
-	printf -- "     To run Puppet agent, please follow from step 3.7 in build instructions.\n"
+	printf -- "Link to build instructions : https://github.com/linux-on-ibm-z/docs/wiki/Building-Puppet\n"
 	printf -- "More information can be found here : https://puppetlabs.com/\n"
 	printf -- '\n'
 }
