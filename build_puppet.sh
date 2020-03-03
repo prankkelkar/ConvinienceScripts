@@ -263,7 +263,7 @@ case "$DISTRO" in
 	printf -- "Installing the dependencies for $PACKAGE_NAME from repository \n" |& tee -a "$LOG_FILE"
 	sudo apt-get update >/dev/null
 	if [ "$USEAS" = "server" ]; then
-		apt-get install -y locales locales-all wget zip unzip tar git g++ make rake libreadline6 libreadline6-dev openssl libyaml-dev libssl-dev libsqlite3-dev libc6-dev cron locales ant zip |& tee -a "$LOG_FILE"
+		sudo apt-get install -y locales locales-all wget zip unzip tar git g++ make rake libreadline6 libreadline6-dev openssl libyaml-dev libssl-dev libsqlite3-dev libc6-dev cron locales ant zip |& tee -a "$LOG_FILE"
 	elif [ "$USEAS" = "agent" ]; then
 		sudo apt-get install -y g++ tar make wget openssl libssl-dev |& tee -a "$LOG_FILE"
 	else
