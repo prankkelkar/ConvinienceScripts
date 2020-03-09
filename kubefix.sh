@@ -14,7 +14,7 @@ function printHelp() {
 }
 
 
-while getopts "h?dy?s:" opt; do
+while getopts "h?dy?v:" opt; do
 	case "$opt" in
 	h | \?)
 		printHelp
