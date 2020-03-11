@@ -10,7 +10,7 @@
 set -e  -o pipefail
 
 PACKAGE_NAME="netty-tcnative"
-PACKAGE_VERSION="2.0.28"
+PACKAGE_VERSION="2.0.29"
 SOURCE_ROOT="$(pwd)"
 USER="$(whoami)"
 
@@ -24,15 +24,8 @@ if [ ! -d "$SOURCE_ROOT/logs/" ]; then
    mkdir -p "$SOURCE_ROOT/logs/"
 fi
 
-# Need handling for RHEL 6.10 as it doesn't have os-release file
-if [ -f "/etc/os-release" ]; then
-	source "/etc/os-release"
-else
-	cat /etc/redhat-release >>"${LOG_FILE}"
-	export ID="rhel"
-	export VERSION_ID="6.x"
-	export PRETTY_NAME="Red Hat Enterprise Linux 6.x"
-fi
+source "/etc/os-release"
+
 
 function prepare() {
 	if command -v "sudo" >/dev/null; then
@@ -79,7 +72,7 @@ function configureAndInstall() {
 	fi
     		
     if [[ "$ID" == "sles"  ]] ;then
-		if [[ "$VERSION_ID" == "12.4"  ]] ;then
+		if [[ "$VERSION_ID" == "12.4" || "$VERSION_ID" == "12.5" ]] ;then
 			export JAVA_HOME=/usr/lib64/jvm/jre-1.8.0-openjdk
 		else
 			export JAVA_HOME=/usr/lib64/jvm/java-1.8.0       
@@ -95,8 +88,8 @@ function configureAndInstall() {
 	printf -- "Java version is :\n"
 	java -version
 	
-	#Install ninja (for SLES 12 SP4 , RHEL )
-	if [[ "$ID" == "rhel" || "$VERSION_ID" == "12.4" ]]  ;then
+	#Install ninja (for SLES 12 SP4, SLES 12 SP4 and RHEL )
+	if [[ "$ID" == "rhel" || "$VERSION_ID" == "12.4"|| "$VERSION_ID" == "12.5" ]]  ;then
 		
 		printf -- "\nInstalling ninja . . . \n"
 		cd $SOURCE_ROOT
@@ -108,7 +101,8 @@ function configureAndInstall() {
 	fi
 	
 	#Install maven (for SLES , RHEL  only)
-	if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" || "$ID" == "sles" ]]  ;then
+	#if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" || "$ID" == "sles" ]]  ;then
+	if [[ "$ID" == "sles" ]]  ;then
 		printf -- "\nInstalling maven . . . \n"
 		cd $SOURCE_ROOT
 		wget http://www.eu.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
@@ -127,41 +121,15 @@ function configureAndInstall() {
 		export GOPATH=$SOURCE_ROOT/go/bin	
 	fi
 	
-	#Install cmake 3.7 (RHEL 7.x  only)
-	if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" ]]  ;then
-		cd $SOURCE_ROOT
-		wget https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
-		tar xzf cmake-3.7.2.tar.gz
-		cd cmake-3.7.2
-		./configure --prefix=/usr/local
-		make && sudo make install	
-	fi
-	
-	#Install gcc 7.5.0 (RHEL 7.6 and RHEL 7.7 only)
-	if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" ]]  ;then
-		cd $SOURCE_ROOT
-		mkdir gcc
-		cd gcc
-		wget https://ftpmirror.gnu.org/gcc/gcc-7.4.0/gcc-7.4.0.tar.xz
-		tar -xf gcc-7.4.0.tar.xz
-		cd gcc-7.4.0
-		./contrib/download_prerequisites
-		mkdir objdir
-		cd objdir
-		../configure --prefix=/opt/gcc --enable-languages=c,c++ --with-arch=zEC12 --with-long-double-128 \
-		--build=s390x-linux-gnu --host=s390x-linux-gnu --target=s390x-linux-gnu                  \
-		--enable-threads=posix --with-system-zlib --disable-multilib
-		make -j 8
-		sudo make install
-		sudo ln -sf /opt/gcc/bin/gcc /usr/bin/gcc
-		sudo ln -sf /opt/gcc/bin/g++ /usr/bin/g++
-		sudo ln -sf /opt/gcc/bin/g++ /usr/bin/c++
-		export PATH=/opt/gcc/bin:"$PATH"
-		export LD_LIBRARY_PATH=/opt/gcc/lib64:"$LD_LIBRARY_PATH"
-		export C_INCLUDE_PATH=/opt/gcc/lib/gcc/s390x-linux-gnu/7.4.0/include
-		export CPLUS_INCLUDE_PATH=/opt/gcc/lib/gcc/s390x-linux-gnu/7.4.0/include
-		sudo ln -sf /opt/gcc/lib64/libstdc++.so.6.0.24 /lib64/libstdc++.so.6
-	fi
+# 	#Install cmake 3.7 (RHEL 7.x  only)
+# 	if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" ]]  ;then
+# 		cd $SOURCE_ROOT
+# 		wget https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
+# 		tar xzf cmake-3.7.2.tar.gz
+# 		cd cmake-3.7.2
+# 		./configure --prefix=/usr/local
+# 		make && sudo make install	
+# 	fi
 	
 	#Build netty-tcnative
 	cd $SOURCE_ROOT
@@ -246,31 +214,30 @@ case "$DISTRO" in
 "rhel-7.5" | "rhel-7.6" | "rhel-7.7")
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- "Installing dependencies... it may take some time.\n"
-	sudo yum install -y perl gcc gcc-c++ openssl-devel apr-devel autoconf automake libtool make tar git java-1.8.0-openjdk-devel wget bzip2  zlib-devel golang patch |& tee -a "${LOG_FILE}"
-    configureAndInstall |& tee -a "${LOG_FILE}"
+	sudo subscription-manager repos --enable=rhel-7-server-for-system-z-rhscl-rpms
+	sudo yum install -y perl maven cmake devtoolset-7-gcc-c++ devtoolset-7-gcc openssl-devel apr-devel autoconf automake libtool make tar git java-1.8.0-openjdk-devel wget bzip2  zlib-devel golang patch |& tee -a "${LOG_FILE}"
+    	source /opt/rh/devtoolset-7/enable
+	configureAndInstall |& tee -a "${LOG_FILE}"
 	;;
-"rhel-8.0")
+"rhel-8.0" | "rhel-8.1")
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- "Installing dependencies... it may take some time.\n"
 	sudo yum install -y cmake perl gcc gcc-c++ openssl-devel apr-devel autoconf automake libtool make tar git java-1.8.0-openjdk-devel wget python2 bzip2 zlib zlib-devel git xz diffutils  maven golang patch |& tee -a "${LOG_FILE}"
 	sudo ln /usr/bin/python2 /usr/bin/python
 	configureAndInstall |& tee -a "${LOG_FILE}"
 	;;
-"sles-12.4")
+"sles-12.4" | "sles-12.5")
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- "Installing dependencies... it may take some time.\n"
 	sudo zypper install -y cmake perl libopenssl-devel libapr1-devel autoconf automake libtool make tar git java-1_8_0-openjdk-devel gcc-c++ wget  which patch |& tee -a "${LOG_FILE}"
-    configureAndInstall |& tee -a "${LOG_FILE}"
+    	configureAndInstall |& tee -a "${LOG_FILE}"
 	;;
 "sles-15.1")
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- "Installing dependencies... it may take some time.\n"
-	sudo zypper install -y ninja cmake perl  libopenssl-devel autoconf automake libtool make tar git java-1_8_0-openjdk-devel wget apr-devel zlib-devel gcc gcc-c++ patch gzip |& tee -a "${LOG_FILE}"
-	if [[ "$VERSION_ID" == "15.1" ]] ;then
-		sudo zypper install -y awk |& tee -a "${LOG_FILE}"
-	fi
+	sudo zypper install -y awk ninja cmake perl  libopenssl-devel autoconf automake libtool make tar git java-1_8_0-openjdk-devel wget apr-devel zlib-devel gcc gcc-c++ patch gzip |& tee -a "${LOG_FILE}"
 	sudo ln -sf /usr/bin/gcc /usr/bin/s390x-linux-gnu-gcc
-    configureAndInstall |& tee -a "${LOG_FILE}"
+    	configureAndInstall |& tee -a "${LOG_FILE}"
 	;;
 *)
 	printf -- "%s not supported \n" "$DISTRO" |& tee -a "$LOG_FILE"
