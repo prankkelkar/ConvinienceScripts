@@ -101,8 +101,7 @@ function configureAndInstall() {
 	fi
 	
 	#Install maven (for SLES , RHEL  only)
-	#if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" || "$ID" == "sles" ]]  ;then
-	if [[ "$ID" == "sles" ]]  ;then
+	if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" || "$ID" == "sles" ]]  ;then
 		printf -- "\nInstalling maven . . . \n"
 		cd $SOURCE_ROOT
 		wget http://www.eu.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
@@ -215,7 +214,7 @@ case "$DISTRO" in
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- "Installing dependencies... it may take some time.\n"
 	sudo subscription-manager repos --enable=rhel-7-server-for-system-z-rhscl-rpms
-	sudo yum install -y perl maven cmake devtoolset-7-gcc-c++ devtoolset-7-gcc openssl-devel apr-devel autoconf automake libtool make tar git java-1.8.0-openjdk-devel wget bzip2  zlib-devel golang patch |& tee -a "${LOG_FILE}"
+	sudo yum install -y perl cmake devtoolset-7-gcc-c++ devtoolset-7-gcc openssl-devel apr-devel autoconf automake libtool make tar git java-1.8.0-openjdk-devel wget bzip2  zlib-devel golang patch |& tee -a "${LOG_FILE}"
     	source /opt/rh/devtoolset-7/enable
 	configureAndInstall |& tee -a "${LOG_FILE}"
 	;;
