@@ -120,15 +120,15 @@ function configureAndInstall() {
 		export GOPATH=$SOURCE_ROOT/go/bin	
 	fi
 	
-# 	#Install cmake 3.7 (RHEL 7.x  only)
-# 	if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" ]]  ;then
-# 		cd $SOURCE_ROOT
-# 		wget https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
-# 		tar xzf cmake-3.7.2.tar.gz
-# 		cd cmake-3.7.2
-# 		./configure --prefix=/usr/local
-# 		make && sudo make install	
-# 	fi
+	#Install cmake 3.7 (RHEL 7.x  only)
+	if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" ]]  ;then
+		cd $SOURCE_ROOT
+		wget https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
+		tar xzf cmake-3.7.2.tar.gz
+		cd cmake-3.7.2
+		./configure --prefix=/usr/local
+		make && sudo make install	
+	fi
 	
 	#Build netty-tcnative
 	cd $SOURCE_ROOT
@@ -214,7 +214,7 @@ case "$DISTRO" in
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- "Installing dependencies... it may take some time.\n"
 	sudo subscription-manager repos --enable=rhel-7-server-for-system-z-rhscl-rpms
-	sudo yum install -y perl cmake devtoolset-7-gcc-c++ devtoolset-7-gcc openssl-devel apr-devel autoconf automake libtool make tar git java-1.8.0-openjdk-devel wget bzip2  zlib-devel golang patch |& tee -a "${LOG_FILE}"
+	sudo yum install -y perl devtoolset-7-gcc-c++ devtoolset-7-gcc openssl-devel apr-devel autoconf automake libtool make tar git java-1.8.0-openjdk-devel wget bzip2  zlib-devel golang patch |& tee -a "${LOG_FILE}"
     	source /opt/rh/devtoolset-7/enable
 	configureAndInstall |& tee -a "${LOG_FILE}"
 	;;
