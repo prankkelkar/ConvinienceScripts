@@ -215,7 +215,7 @@ case "$DISTRO" in
 	printf -- "Installing dependencies... it may take some time.\n"
 	sudo subscription-manager repos --enable=rhel-7-server-for-system-z-rhscl-rpms
 	sudo yum install -y perl devtoolset-7-gcc-c++ devtoolset-7-gcc openssl-devel apr-devel autoconf automake libtool make tar git java-1.8.0-openjdk-devel wget bzip2  zlib-devel golang patch |& tee -a "${LOG_FILE}"
-    	source /opt/rh/devtoolset-7/enable
+    source /opt/rh/devtoolset-7/enable
 	configureAndInstall |& tee -a "${LOG_FILE}"
 	;;
 "rhel-8.0" | "rhel-8.1")
@@ -229,14 +229,14 @@ case "$DISTRO" in
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- "Installing dependencies... it may take some time.\n"
 	sudo zypper install -y cmake perl libopenssl-devel libapr1-devel autoconf automake libtool make tar git java-1_8_0-openjdk-devel gcc-c++ wget  which patch |& tee -a "${LOG_FILE}"
-    	configureAndInstall |& tee -a "${LOG_FILE}"
+    configureAndInstall |& tee -a "${LOG_FILE}"
 	;;
 "sles-15.1")
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- "Installing dependencies... it may take some time.\n"
 	sudo zypper install -y awk ninja cmake perl  libopenssl-devel autoconf automake libtool make tar git java-1_8_0-openjdk-devel wget apr-devel zlib-devel gcc gcc-c++ patch gzip |& tee -a "${LOG_FILE}"
 	sudo ln -sf /usr/bin/gcc /usr/bin/s390x-linux-gnu-gcc
-    	configureAndInstall |& tee -a "${LOG_FILE}"
+    configureAndInstall |& tee -a "${LOG_FILE}"
 	;;
 *)
 	printf -- "%s not supported \n" "$DISTRO" |& tee -a "$LOG_FILE"
