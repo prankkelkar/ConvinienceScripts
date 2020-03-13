@@ -10,6 +10,7 @@ function printHelp() {
 	echo "Usage: "
 	echo "Please make sure u have make, curl and git "
 	echo "  kubefix.sh [-v kubernetes version]  "
+	echo "  For eg: bash kubefix.sh -v v1.17.3  "
 	echo
 }
 
