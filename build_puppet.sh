@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# © Copyright IBM Corporation 2020.
+# © Copyright IBM Corporation 2019, 2020.
 # LICENSE: Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
 #
 # Instructions:
@@ -9,7 +9,6 @@
 set -e -o pipefail
 
 CURDIR="$(pwd)"
-FULL_HOSTNAME="$(hostname -f)"
 PACKAGE_NAME="Puppet"
 PACKAGE_VERSION="6.13.0"
 SERVER_VERSION="6.9.0"
@@ -20,7 +19,6 @@ JFFI_VERSION="1.2.19"
 JRUBY_VERSION="9.2.8.0"
 FORCE="false"
 LOG_FILE="$CURDIR/logs/${PACKAGE_NAME}-${PACKAGE_VERSION}-$(date +"%F-%T").log"
-PUPPET_CONFIG_URL="https://raw.githubusercontent.com/prankkelkar/ConvinienceScripts/master/puppet.conf"
 
 trap cleanup 0 1 2 ERR
 
@@ -67,11 +65,10 @@ function checkPrequisites() {
 
 function cleanup() {
 
-    rm -rf "${CURDIR}/META-INF"
-    rm -rf "${CURDIR}/std.jar"
-    rm -rf "ruby-${RUBY_FULL_VERSION}.tar.gz"
-    rm -rf "OpenJDK8U-jdk_s390x_linux_hotspot_8u242b08.tar.gz"
-
+	if [[ -f "ruby"-${RUBY_VERSION}.tar.gz ]]; then
+		sudo rm "ruby"-${RUBY_VERSION}.tar.gz
+		printf -- 'Cleaned up the artifacts\n' >>"$LOG_FILE"
+	fi
 }
 
 function configureAndInstall() {
@@ -80,7 +77,7 @@ function configureAndInstall() {
 	if [[ ("$ID" == "rhel" || "$ID" == "ubuntu" && "$VERSION_ID" == "16.04")]]; then
 		cd "$CURDIR"
 		wget http://cache.ruby-lang.org/pub/ruby/$RUBY_VERSION/ruby-$RUBY_FULL_VERSION.tar.gz
-		tar -xvf ruby-$RUBY_FULL_VERSION.tar.gz
+		tar -xzf ruby-$RUBY_FULL_VERSION.tar.gz
 		cd ruby-$RUBY_FULL_VERSION
 		./configure && make && sudo -E make install
 	fi
@@ -97,7 +94,7 @@ function configureAndInstall() {
 	if [ "$USEAS" = "server" ]; then
         printf -- 'Build puppetserver and Installation started \n'
         printf -- 'Build jffi lib \n'
-		# install Java 8 and build jffi
+        # install Java 8 and build jffi
         cd $CURDIR
         wget https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jdk_s390x_linux_hotspot_8u242b08.tar.gz
         tar zxf OpenJDK8U-jdk_s390x_linux_hotspot_8u242b08.tar.gz
@@ -105,7 +102,7 @@ function configureAndInstall() {
         export PATH=$JAVA_HOME/bin:$PATH
 
         wget https://github.com/jnr/jffi/archive/jffi-$JFFI_VERSION.tar.gz
-        tar -xzf jffi-$JFFI_VERSION.tar.gz
+        tar xzf jffi-$JFFI_VERSION.tar.gz
         cd jffi-jffi-$JFFI_VERSION
         ant jar
 
@@ -126,44 +123,43 @@ function configureAndInstall() {
         git clone --recursive --branch $SERVER_VERSION git://github.com/puppetlabs/puppetserver
         cd puppetserver
 
-		printf -- 'Setup config files \n'
-		export LANG="en_US.UTF-8"
-	    if ! ./dev-setup ; then
+        printf -- 'Setup config files \n'
+        export LANG="en_US.UTF-8"
+        if ! ./dev-setup ; then
 			cp $CURDIR/jffi-jffi-$JFFI_VERSION/build/native.jar  ~/.m2/repository/com/github/jnr/jffi/$JFFI_VERSION/jffi-$JFFI_VERSION-native.jar
 			# remove invalid gems
 			rm ~/.puppetlabs/opt/server/data/puppetserver/vendored-jruby-gems/cache/*.gem
 			# re-run
+			export LANG="en_US.UTF-8"
 			./dev-setup
-		fi
+        fi
 
-		#Locate the $confdir
-		confdir=~/.puppetlabs/etc/puppet
-		echo "$confdir"
-		if [[ ! -f "$confdir" ]]; then
+        #Locate the $confdir
+        confdir=~/.puppetlabs/etc/puppet
+        echo "$confdir"
+        if [[ ! -f "$confdir" ]]; then
 			mkdir -p "$confdir"
-		fi
+        fi
 
-		# Add sample puppet.conf
-		mkdir "$confdir"/modules
-		mkdir "$confdir"/manifests
-		cd "$confdir"
-		#Remove default config file
-        rm -rf "$confdir/puppet.conf"
-        wget "$PUPPET_CONFIG_URL" 
-        sed -i "s/server.myhost.com/$FULL_HOSTNAME/g" "$confdir/puppet.conf"
-		wget https://raw.githubusercontent.com/puppetlabs/puppet/master/conf/auth.conf
-		mkdir -p "$confdir"/opt/puppetlabs/puppet
-		mkdir -p "$confdir"/var/log/puppetlabs
+        # Add sample puppet.conf
+        mkdir "$confdir"/modules
+        mkdir "$confdir"/manifests
+        cd "$confdir"
+        touch puppet.conf
+        wget https://raw.githubusercontent.com/puppetlabs/puppet/master/conf/auth.conf
+        mkdir -p "$confdir"/opt/puppetlabs/puppet
+        mkdir -p "$confdir"/var/log/puppetlabs
 
-		printf -- 'Update JRuby jars\n'
-		cd $CURDIR
-		unzip -q ~/.m2/repository/org/jruby/jruby-stdlib/$JRUBY_VERSION/jruby-stdlib-$JRUBY_VERSION.jar
-		cp META-INF/jruby.home/lib/ruby/stdlib/ffi/platform/powerpc-aix/*.rb META-INF/jruby.home/lib/ruby/stdlib/ffi/platform/s390x-linux/
-		cp META-INF/jruby.home/lib/ruby/stdlib/ffi/platform/powerpc-aix/platform.conf META-INF/jruby.home/lib/ruby/stdlib/ffi/platform/s390x-linux/
-		zip -qr std.jar META-INF
-		cp std.jar ~/.m2/repository/org/jruby/jruby-stdlib/$JRUBY_VERSION/jruby-stdlib-$JRUBY_VERSION.jar
+        printf -- 'Update JRuby jars\n'
+        cd $CURDIR
+        unzip -q ~/.m2/repository/org/jruby/jruby-stdlib/$JRUBY_VERSION/jruby-stdlib-$JRUBY_VERSION.jar
+        cp META-INF/jruby.home/lib/ruby/stdlib/ffi/platform/powerpc-aix/*.rb META-INF/jruby.home/lib/ruby/stdlib/ffi/platform/s390x-linux/
+        cp META-INF/jruby.home/lib/ruby/stdlib/ffi/platform/powerpc-aix/platform.conf META-INF/jruby.home/lib/ruby/stdlib/ffi/platform/s390x-linux/
+        zip -qr std.jar META-INF
+        cp std.jar ~/.m2/repository/org/jruby/jruby-stdlib/$JRUBY_VERSION/jruby-stdlib-$JRUBY_VERSION.jar
+        rm -rf META-INF std.jar
 
-		printf -- 'Completed Puppet server setup \n'
+        printf -- 'Completed Puppet server setup \n'
 
 	elif [ "$USEAS" = "agent" ]; then
 		#Install Puppet
@@ -237,16 +233,16 @@ while getopts "h?dy?s:" opt; do
 done
 
 function gettingStarted() {
-    if [ "$USEAS" = "server" ]; then
-        printf -- "Puppet server is installed successfully. \n"
-        printf -- "To run Puppet server, please follow step 2.9 from build instructions. \n"
-    else
-        printf -- "Puppet agent is installed successfully. \n"
-        printf -- "set confdir variable with following command.  \n"
-        printf -- "     export confdir=`puppet agent --configprint confdir` \n"
-        printf -- "Continue with step 3.7 from build instructions\n"
-    fi
-	printf -- "Link to build instructions : https://github.com/linux-on-ibm-z/docs/wiki/Building-Puppet\n"
+	printf -- "Puppet installed successfully. \n"
+	printf -- '\n'
+	printf -- "     To run Puppet server, set the environment variables below and follow from step 2.8 to update puppet.conf in build instructions\n"
+	printf -- "     	export JAVA_HOME=$JAVA_HOME\n"
+	printf -- "     	export PATH=\$JAVA_HOME/bin:\$PATH\n"
+	printf -- "     	export confdir=~/.puppetlabs/etc/puppet\n"
+	printf -- '\n'
+	printf -- "     To run Puppet agent, set \$confdir and follow from step 3.7 in build instructions.\n"
+	printf -- "     	export confdir=\`puppet agent --configprint confdir\`\n"
+	printf -- '\n'
 	printf -- "More information can be found here : https://puppetlabs.com/\n"
 	printf -- '\n'
 }
@@ -263,7 +259,7 @@ case "$DISTRO" in
 	printf -- "Installing the dependencies for $PACKAGE_NAME from repository \n" |& tee -a "$LOG_FILE"
 	sudo apt-get update >/dev/null
 	if [ "$USEAS" = "server" ]; then
-		sudo apt-get install -y locales locales-all wget zip unzip tar git g++ make rake libreadline6 libreadline6-dev openssl libyaml-dev libssl-dev libsqlite3-dev libc6-dev cron locales ant zip |& tee -a "$LOG_FILE"
+		sudo apt-get install -y wget zip unzip tar git g++ make rake libreadline6 libreadline6-dev openssl libyaml-dev libssl-dev libsqlite3-dev libc6-dev cron locales locales-all ant zip |& tee -a "$LOG_FILE"
 	elif [ "$USEAS" = "agent" ]; then
 		sudo apt-get install -y g++ tar make wget openssl libssl-dev |& tee -a "$LOG_FILE"
 	else
@@ -278,7 +274,7 @@ case "$DISTRO" in
 	printf -- "Installing the dependencies for $PACKAGE_NAME from repository \n" |& tee -a "$LOG_FILE"
 	sudo apt-get update >/dev/null
 	if [ "$USEAS" = "server" ]; then
-		sudo apt-get install -y locales locales-all g++ libreadline7 libreadline-dev tar make git wget libsqlite3-dev libc6-dev cron locales unzip libyaml-dev zlibc zlib1g-dev zlib1g libxml2-dev libgdbm-dev openssl1.0 libssl1.0-dev ruby ruby-dev ant zip  |& tee -a "$LOG_FILE"
+		sudo apt-get install -y g++ libreadline7 libreadline-dev tar make git wget libsqlite3-dev libc6-dev cron locales locales-all unzip libyaml-dev zlibc zlib1g-dev zlib1g libxml2-dev libgdbm-dev openssl1.0 libssl1.0-dev ruby ruby-dev ant zip  |& tee -a "$LOG_FILE"
 	elif [ "$USEAS" = "agent" ]; then
 		sudo apt-get install -y g++ tar make wget openssl1.0 libssl1.0-dev ruby ruby-dev |& tee -a "$LOG_FILE"
 	else
