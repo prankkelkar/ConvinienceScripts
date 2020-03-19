@@ -234,15 +234,8 @@ done
 
 function gettingStarted() {
 	printf -- "Puppet installed successfully. \n"
-	printf -- '\n'
-	printf -- "     To run Puppet server, set the environment variables below and follow from step 2.8 to update puppet.conf in build instructions\n"
-	printf -- "     	export JAVA_HOME=$JAVA_HOME\n"
-	printf -- "     	export PATH=\$JAVA_HOME/bin:\$PATH\n"
-	printf -- "     	export confdir=~/.puppetlabs/etc/puppet\n"
-	printf -- '\n'
-	printf -- "     To run Puppet agent, set \$confdir and follow from step 3.7 in build instructions.\n"
-	printf -- "     	export confdir=\`puppet agent --configprint confdir\`\n"
-	printf -- '\n'
+	printf -- "     To run Puppet server, please follow from step 2.8 in build instructions.\n"
+	printf -- "     To run Puppet agent, please follow from step 3.7 in build instructions.\n"
 	printf -- "More information can be found here : https://puppetlabs.com/\n"
 	printf -- '\n'
 }
@@ -259,7 +252,7 @@ case "$DISTRO" in
 	printf -- "Installing the dependencies for $PACKAGE_NAME from repository \n" |& tee -a "$LOG_FILE"
 	sudo apt-get update >/dev/null
 	if [ "$USEAS" = "server" ]; then
-		sudo apt-get install -y wget zip unzip tar git g++ make rake libreadline6 libreadline6-dev openssl libyaml-dev libssl-dev libsqlite3-dev libc6-dev cron locales locales-all ant zip |& tee -a "$LOG_FILE"
+		sudo apt-get install -y locales locales-all wget zip unzip tar git g++ make rake libreadline6 libreadline6-dev openssl libyaml-dev libssl-dev libsqlite3-dev libc6-dev cron locales ant zip |& tee -a "$LOG_FILE"
 	elif [ "$USEAS" = "agent" ]; then
 		sudo apt-get install -y g++ tar make wget openssl libssl-dev |& tee -a "$LOG_FILE"
 	else
@@ -274,7 +267,7 @@ case "$DISTRO" in
 	printf -- "Installing the dependencies for $PACKAGE_NAME from repository \n" |& tee -a "$LOG_FILE"
 	sudo apt-get update >/dev/null
 	if [ "$USEAS" = "server" ]; then
-		sudo apt-get install -y g++ libreadline7 libreadline-dev tar make git wget libsqlite3-dev libc6-dev cron locales locales-all unzip libyaml-dev zlibc zlib1g-dev zlib1g libxml2-dev libgdbm-dev openssl1.0 libssl1.0-dev ruby ruby-dev ant zip  |& tee -a "$LOG_FILE"
+		sudo apt-get install -y locales locales-all g++ libreadline7 libreadline-dev tar make git wget libsqlite3-dev libc6-dev cron locales unzip libyaml-dev zlibc zlib1g-dev zlib1g libxml2-dev libgdbm-dev openssl1.0 libssl1.0-dev ruby ruby-dev ant zip  |& tee -a "$LOG_FILE"
 	elif [ "$USEAS" = "agent" ]; then
 		sudo apt-get install -y g++ tar make wget openssl1.0 libssl1.0-dev ruby ruby-dev |& tee -a "$LOG_FILE"
 	else
