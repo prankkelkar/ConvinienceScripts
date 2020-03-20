@@ -4,18 +4,17 @@ The DRAFT instructions provided below specify the steps to build Kubernetes vers
 
 * Ubuntu (16.04, 18.04)
 * RHEL (7.5, 7.6, 7.7)
-* SLES (12 SP4, 12 SP5, 15 SP1)
 
 _**General Notes:**_
 * _When following the steps below please use a standard permission user for ubuntu and super user for rhel and sles._
 * _A directory `/<source_root>/` will be referred to in these instructions, this is a temporary writable directory anywhere you'd like to place it._
 * _Docker-ce versions between 17.06 and 18.02 have a known [issue](https://github.com/docker/for-linux/issues/238) on IBM Z. This has been fixed in version 18.03_
-* _SLES uses btrfs by default. The docker “overlay” driver is not supported with this file-system, so it is sensible to use etx4 in /var/lib/docker.The Kubernetes kubeadm installer will stop if it finds btrfs._
+
 
 ### Prerequisites:
 * Docker (Refer instructions mentioned [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/))
 
-_**Note:**_ These build instructions were tested with docker version 18.06 on ubuntu and rhel and docker version 19.03 on sles at the time of creation of this document. 
+_**Note:**_ These build instructions were tested with docker version 18.06 at the time of creation of this document. 
 
 ## Step 1: Install dependancies
 ```bash
@@ -32,11 +31,6 @@ export SOURCE_ROOT=/<source_root>/
 * RHEL (7.5, 7.6, 7.7)
     ```bash
     yum install git make wget
-    ```
-
-* SLES (12 SP4, 12 SP5, 15 SP1)
-    ```bash
-    zypper install git make wget
     ```
 
 ## Step 2: Install kubeadm, kubelet and kubectl
@@ -78,31 +72,6 @@ export SOURCE_ROOT=/<source_root>/
         systemctl enable --now kubelet
         ```
 
-* SLES (12 SP4, 12 SP5, 15 SP1)
-
-    * Configure iptables
-        ```bash
-        cat <<EOF > /etc/sysctl.conf
-        net.ipv4.ip_forward=1
-        net.ipv4.conf.all.forwarding=1
-        net.bridge.bridge-nf-call-iptables=1
-        EOF
-
-        sysctl -p
-        ```
-        
-    * Add repository and install kubeadm, kubelet and kubectl.
-        ```bash
-        zypper addrepo --type yum --gpgcheck-strict --refresh https://packages.cloud.google.com/yum/repos/kubernetes-el7-s390x google-k8s
-        rpm --import https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-        rpm --import https://packages.cloud.google.com/yum/doc/yum-key.gpg
-        rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}\n'
-        
-        zypper refresh google-k8s
-        zypper install kubelet-1.17.4-0.s390x kubernetes-cni-0.7.5-0.s390x kubeadm-1.17.4-0.s390x cri-tools-1.13.0-0 kubectl-1.17.4-0.s390x
-        systemctl enable kubelet.service
-        ```
-        _**Note:**_ If you encounter `Problem: nothing provides conntrack needed by "package-name"` while installing kubelet for sles, choose `Solution x: break "package-name" by ignoring some of its dependencies`
 
 ## Step 3: Create a single control-plane cluster with kubeadm
 
