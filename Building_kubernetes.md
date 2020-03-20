@@ -4,7 +4,7 @@ The DRAFT instructions provided below specify the steps to build Kubernetes vers
 
 * Ubuntu (16.04, 18.04)
 * RHEL (7.5, 7.6, 7.7)
-* SLES (12 SP4, 12 SP5, 15 SP1)
+* SLES 12 SP4
 
 _**General Notes:**_
 * _When following the steps below please use a standard permission user for ubuntu and super user for rhel and sles._
@@ -34,7 +34,7 @@ export SOURCE_ROOT=/<source_root>/
     yum install git make wget
     ```
 
-* SLES (12 SP4, 12 SP5, 15 SP1)
+* SLES 12 SP4
     ```bash
     zypper install git make wget
     ```
@@ -78,7 +78,7 @@ export SOURCE_ROOT=/<source_root>/
         systemctl enable --now kubelet
         ```
 
-* SLES (12 SP4, 12 SP5, 15 SP1)
+* SLES 12 SP4
 
     * Configure iptables
         ```bash
