@@ -13,7 +13,7 @@ _**General Notes:**_
 * _SLES uses btrfs by default. The docker “overlay” driver is not supported with this file-system, so it is sensible to use etx4 in /var/lib/docker.The Kubernetes kubeadm installer will stop if it finds btrfs._
 
 ### Prerequisites:
-* Docker (Refer instructions mentioned [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/))
+* Docker packages are provided for SLES and Ubuntu in their respective repositories. On RHEL docker can be installed using static binaries found [here](https://download.docker.com/linux/static/stable/s390x/).   
 
 _**Note:**_ These build instructions were tested with docker version 18.06 on ubuntu and rhel and docker version 19.03 on sles at the time of creation of this document. 
 
@@ -195,3 +195,5 @@ _**Note:**_ It might take some time for pods to come up.
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#join-nodes - Adding new nodes to the cluster
 
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/ - Official documentation
+
+https://developer.ibm.com/storage/2019/03/01/kubernetes-1-12-on-suse-linux-using-kubeadm/#General_preparation - Kubernetes on sles
