@@ -2,7 +2,7 @@
 
 The DRAFT instructions provided below specify the steps to build Kubernetes version v1.17.4 on Linux on IBM Z for the following distributions:
 
-* Ubuntu (16.04, 18.04)
+* Ubuntu (16.04, 18.04, 19.10)
 * RHEL (7.5, 7.6, 7.7)
 * SLES (12 SP4, 12 SP5, 15 SP1)
 
@@ -23,7 +23,7 @@ _**Note:**_ These build instructions were tested with docker version 18.06 on ub
 export SOURCE_ROOT=/<source_root>/
 ```
 
-* Ubuntu (16.04, 18.04)	
+* Ubuntu (16.04, 18.04, 19.10)	
     ```bash
     sudo apt-get update
     sudo apt-get install git make wget
