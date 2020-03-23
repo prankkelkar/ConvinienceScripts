@@ -4,10 +4,10 @@ The DRAFT instructions provided below specify the steps to build Kubernetes vers
 
 * Ubuntu (16.04, 18.04)
 * RHEL (7.5, 7.6, 7.7)
-* SLES 12 SP4
+* SLES (12 SP4, 12 SP5, 15 SP1)
 
 _**General Notes:**_
-* _When following the steps below please use a standard permission user for ubuntu and super user for rhel and sles._
+* _When following the steps below please  use a super user._
 * _A directory `/<source_root>/` will be referred to in these instructions, this is a temporary writable directory anywhere you'd like to place it._
 * _Docker-ce versions between 17.06 and 18.02 have a known [issue](https://github.com/docker/for-linux/issues/238) on IBM Z. This has been fixed in version 18.03_
 * _SLES uses btrfs by default. The docker “overlay” driver is not supported with this file-system, so it is sensible to use etx4 in /var/lib/docker.The Kubernetes kubeadm installer will stop if it finds btrfs._
@@ -34,16 +34,45 @@ export SOURCE_ROOT=/<source_root>/
     yum install git make wget
     ```
 
-* SLES 12 SP4
+* SLES (12 SP4, 12 SP5, 15 SP1)
     ```bash
     zypper install git make wget
     ```
 
 ## Step 2: Install kubeadm, kubelet and kubectl
 
-* Ubuntu (16.04, 18.04)	
+* Ubuntu (16.04, 18.04, 19.10)
 
-    Please follow official documentation [here](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) to install kubeadm, kubelet and kubectl.
+    * Configure iptables
+        ```bash
+        cat <<EOF > /etc/sysctl.d/k8s.conf
+        net.bridge.bridge-nf-call-ip6tables = 1
+        net.bridge.bridge-nf-call-iptables = 1
+        EOF
+
+        sysctl --system
+
+        # ensure legacy binaries are installed
+        sudo apt-get install -y iptables arptables ebtables
+
+        # switch to legacy versions
+        sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+        sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+        sudo update-alternatives --set arptables /usr/sbin/arptables-legacy
+        sudo update-alternatives --set ebtables /usr/sbin/ebtables-legacy
+        ``` 
+    
+    * Add repository and install kubeadm, kubelet and kubectl.
+        ```bash
+            sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+            curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+            cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+            deb https://apt.kubernetes.io/ kubernetes-xenial main
+            EOF
+            sudo apt-get update
+            sudo apt-get install -y kubelet=1.17.4-00 kubectl=1.17.4-00 kubeadm=1.17.4-00
+            sudo apt-mark hold kubelet kubeadm kubectl
+        ```   
 
 * RHEL (7.5, 7.6, 7.7)
 
@@ -73,12 +102,12 @@ export SOURCE_ROOT=/<source_root>/
         setenforce 0
         sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 
-        yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+        yum install -y kubelet-1.17.4-0.s390x kubeadm-1.17.4-0.s390x kubectl-1.17.4-0.s390x --disableexcludes=kubernetes
 
         systemctl enable --now kubelet
         ```
 
-* SLES 12 SP4
+* SLES (12 SP4, 12 SP5, 15 SP1)
 
     * Configure iptables
         ```bash
