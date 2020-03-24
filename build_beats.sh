@@ -345,7 +345,7 @@ case "$DISTRO" in
 	printf -- "Installing dependencies... it may take some time.\n"
 	sudo apt-get update -y
 	sudo apt-get install -y git curl make wget tar gcc python3 python3-setuptools libcap-dev libpcap0.8-dev openssl libssh-dev python3-openssl acl rsync tzdata patch fdclone libsystemd-dev |& tee -a "${LOG_FILE}"
-	ln -sf /usr/bin/python /usr/bin/python3	
+	sudo ;ln -sf /usr/bin/python3 /usr/bin/python	
 	configureAndInstall |& tee -a "${LOG_FILE}"
 	;;
 
