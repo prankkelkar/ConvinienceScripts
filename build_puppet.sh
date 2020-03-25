@@ -162,7 +162,7 @@ function configureAndInstall() {
         printf -- 'Completed Puppet server setup \n'
 ​
 	elif [ "$USEAS" = "agent" ]; then
-		#Install Puppet and factor gem
+		#Install Puppet
 		if [[ "$ID" == "ubuntu" && "$VERSION_ID" == "18.04" ]]; then
 			cd "$CURDIR"
 			sudo /usr/bin/gem install facter -v 2.5.7
