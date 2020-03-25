@@ -5,9 +5,9 @@
 # Instructions:
 # Download build script: wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/Puppet/6.13.0/build_puppet.sh
 # Execute build script: bash build_puppet.sh    (provide -h for help)
-
+​
 set -e -o pipefail
-
+​
 CURDIR="$(pwd)"
 PACKAGE_NAME="Puppet"
 PACKAGE_VERSION="6.13.0"
@@ -19,24 +19,24 @@ JFFI_VERSION="1.2.19"
 JRUBY_VERSION="9.2.8.0"
 FORCE="false"
 LOG_FILE="$CURDIR/logs/${PACKAGE_NAME}-${PACKAGE_VERSION}-$(date +"%F-%T").log"
-
+​
 trap cleanup 0 1 2 ERR
-
+​
 #Check if directory exsists
 if [ ! -d "$CURDIR/logs" ]; then
 	mkdir -p "$CURDIR/logs"
 fi
-
+​
 source "/etc/os-release"
-
+​
 function checkPrequisites() {
 	printf -- "Checking Prequisites\n"
-
+​
 	if [ -z "$USEAS" ]; then
 		printf "Option -s must be specified with argument server/agent \n"
 		exit
 	fi
-
+​
 	if command -v "sudo" >/dev/null; then
 		printf -- 'Sudo : Yes\n' >>"$LOG_FILE"
 	else
@@ -62,15 +62,15 @@ function checkPrequisites() {
 		done
 	fi
 }
-
+​
 function cleanup() {
-
+​
 	if [[ -f "ruby"-${RUBY_VERSION}.tar.gz ]]; then
 		sudo rm "ruby"-${RUBY_VERSION}.tar.gz
 		printf -- 'Cleaned up the artifacts\n' >>"$LOG_FILE"
 	fi
 }
-
+​
 function configureAndInstall() {
 	printf -- 'Configuration and Installation started \n'
 	#Download and install Ruby
@@ -81,7 +81,7 @@ function configureAndInstall() {
 		cd ruby-$RUBY_FULL_VERSION
 		./configure && make && sudo -E make install
 	fi
-
+​
 	#Install bundler
 	if [[ "$ID" == "ubuntu" && "$VERSION_ID" == "18.04" ]]; then
 		cd "$CURDIR"
@@ -90,7 +90,7 @@ function configureAndInstall() {
 		cd "$CURDIR"
 		sudo /usr/local/bin/gem install bundler rake-compiler
 	fi
-
+​
 	if [ "$USEAS" = "server" ]; then
         printf -- 'Build puppetserver and Installation started \n'
         printf -- 'Build jffi lib \n'
@@ -100,29 +100,29 @@ function configureAndInstall() {
         tar zxf OpenJDK8U-jdk_s390x_linux_hotspot_8u242b08.tar.gz
         export JAVA_HOME=$CURDIR/jdk8u242-b08
         export PATH=$JAVA_HOME/bin:$PATH
-
+​
         wget https://github.com/jnr/jffi/archive/jffi-$JFFI_VERSION.tar.gz
         tar xzf jffi-$JFFI_VERSION.tar.gz
         cd jffi-jffi-$JFFI_VERSION
         ant jar
-
+​
         printf -- 'Download lein   \n'
         cd $CURDIR
         wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
         chmod +x lein && sudo  mv lein /usr/bin/
-
+​
         printf -- 'Download openjdk-11 and set up \n'
         cd $CURDIR
         wget https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.6%2B10/OpenJDK11U-jdk_s390x_linux_hotspot_11.0.6_10.tar.gz
         tar xzf OpenJDK11U-jdk_s390x_linux_hotspot_11.0.6_10.tar.gz
         export JAVA_HOME=$CURDIR/jdk-11.0.6+10
         export PATH=$JAVA_HOME/bin:$PATH
-
+​
         printf -- 'Get puppetserver \n'
         cd $CURDIR
         git clone --recursive --branch $SERVER_VERSION git://github.com/puppetlabs/puppetserver
         cd puppetserver
-
+​
         printf -- 'Setup config files \n'
         export LANG="en_US.UTF-8"
         if ! ./dev-setup ; then
@@ -133,14 +133,14 @@ function configureAndInstall() {
 			export LANG="en_US.UTF-8"
 			./dev-setup
         fi
-
+​
         #Locate the $confdir
         confdir=~/.puppetlabs/etc/puppet
         echo "$confdir"
         if [[ ! -f "$confdir" ]]; then
 			mkdir -p "$confdir"
         fi
-
+​
         # Add sample puppet.conf
         mkdir "$confdir"/modules
         mkdir "$confdir"/manifests
@@ -149,7 +149,7 @@ function configureAndInstall() {
         wget https://raw.githubusercontent.com/puppetlabs/puppet/master/conf/auth.conf
         mkdir -p "$confdir"/opt/puppetlabs/puppet
         mkdir -p "$confdir"/var/log/puppetlabs
-
+​
         printf -- 'Update JRuby jars\n'
         cd $CURDIR
         unzip -q ~/.m2/repository/org/jruby/jruby-stdlib/$JRUBY_VERSION/jruby-stdlib-$JRUBY_VERSION.jar
@@ -158,11 +158,11 @@ function configureAndInstall() {
         zip -qr std.jar META-INF
         cp std.jar ~/.m2/repository/org/jruby/jruby-stdlib/$JRUBY_VERSION/jruby-stdlib-$JRUBY_VERSION.jar
         rm -rf META-INF std.jar
-
+​
         printf -- 'Completed Puppet server setup \n'
-
+​
 	elif [ "$USEAS" = "agent" ]; then
-		#Install Puppet
+		#Install Puppet and factor gem
 		if [[ "$ID" == "ubuntu" && "$VERSION_ID" == "18.04" ]]; then
 			cd "$CURDIR"
 			sudo /usr/bin/gem install facter -v 2.5.7
@@ -172,42 +172,42 @@ function configureAndInstall() {
 			sudo /usr/local/bin/gem install facter -v 2.5.7
 			sudo /usr/local/bin/gem install puppet -v $PACKAGE_VERSION
 		fi
-
+​
 		#Locate the $confdir by command
 		confdir=$(puppet agent --configprint confdir)
 		echo "$confdir"
 		if [[ ! -f "$confdir" ]]; then
 			mkdir -p "$confdir"
 		fi
-
+​
 		cd "$confdir"
 		mkdir -p "$confdir"/opt/puppetlabs/puppet
 		mkdir -p "$confdir"/var/log/puppetlabs
 		touch puppet.conf
-
+​
 		printf -- 'Completed Puppet agent setup \n'
 	else
 		printf -- "please enter the argument (server/agent) with option -s "
 		exit
 	fi
 }
-
-
+​
+​
 function logDetails() {
 	printf -- '**************************** SYSTEM DETAILS *************************************************************\n' >"$LOG_FILE"
-
+​
 	if [ -f "/etc/os-release" ]; then
 		cat "/etc/os-release" >>"$LOG_FILE"
 	fi
-
+​
 	cat /proc/version >>"$LOG_FILE"
 	printf -- '*********************************************************************************************************\n' >>"$LOG_FILE"
-
+​
 	printf -- "Detected %s \n" "$PRETTY_NAME"
 	printf -- "Request details : PACKAGE NAME= %s , VERSION= %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" |& tee -a "$LOG_FILE"
-
+​
 }
-
+​
 # Print the usage message
 function printHelp() {
 	echo
@@ -215,7 +215,7 @@ function printHelp() {
 	echo "  build_puppet.sh [-s server/agent]  "
 	echo
 }
-
+​
 while getopts "h?dy?s:" opt; do
 	case "$opt" in
 	h | \?)
@@ -233,7 +233,7 @@ while getopts "h?dy?s:" opt; do
 		;;
 	esac
 done
-
+​
 function gettingStarted() {
 	printf -- "Puppet installed successfully. \n"
 	printf -- '\n'
@@ -248,13 +248,13 @@ function gettingStarted() {
 	printf -- "More information can be found here : https://puppetlabs.com/\n"
 	printf -- '\n'
 }
-
+​
 ###############################################################################################################
-
+​
 logDetails
 DISTRO="$ID-$VERSION_ID"
 checkPrequisites #Check Prequisites
-
+​
 case "$DISTRO" in
 "ubuntu-16.04")
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
@@ -270,7 +270,7 @@ case "$DISTRO" in
 	fi
 	configureAndInstall |& tee -a "$LOG_FILE"
 	;;
-
+​
 "ubuntu-18.04")
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- "Installing the dependencies for $PACKAGE_NAME from repository \n" |& tee -a "$LOG_FILE"
@@ -285,7 +285,7 @@ case "$DISTRO" in
 	fi
 	configureAndInstall |& tee -a "$LOG_FILE"
 	;;
-
+​
 "rhel-7.7" | "rhel-7.5" | "rhel-7.6")
 	printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
 	printf -- "Installing the dependencies for $PACKAGE_NAME from repository \n" |& tee -a "$LOG_FILE"
@@ -298,13 +298,13 @@ case "$DISTRO" in
 		exit
 	fi
 	configureAndInstall |& tee -a "$LOG_FILE"
-
+​
 	;;
-
+​
 *)
 	printf -- "%s not supported \n" "$DISTRO" |& tee -a "$LOG_FILE"
 	exit 1
 	;;
 esac
-
+​
 gettingStarted |& tee -a "$LOG_FILE"
