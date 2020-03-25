@@ -165,9 +165,11 @@ function configureAndInstall() {
 		#Install Puppet
 		if [[ "$ID" == "ubuntu" && "$VERSION_ID" == "18.04" ]]; then
 			cd "$CURDIR"
+			sudo /usr/bin/gem install facter -v 2.5.7
 			sudo /usr/bin/gem install puppet -v $PACKAGE_VERSION
 		else
 			cd "$CURDIR"
+			sudo /usr/local/bin/gem install facter -v 2.5.7
 			sudo /usr/local/bin/gem install puppet -v $PACKAGE_VERSION
 		fi
 
