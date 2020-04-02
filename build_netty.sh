@@ -3,14 +3,14 @@
 # LICENSE: Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
 #
 # Instructions:
-# Download build script: wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/netty-tcnative/2.0.28/build_netty.sh
+# Download build script: wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/netty-tcnative/2.0.30/build_netty.sh
 # Execute build script: bash build_netty.sh    (provide -h for help)
 #
 
 set -e  -o pipefail
 
 PACKAGE_NAME="netty-tcnative"
-PACKAGE_VERSION="2.0.29"
+PACKAGE_VERSION="2.0.30"
 SOURCE_ROOT="$(pwd)"
 USER="$(whoami)"
 
@@ -68,38 +68,38 @@ function configureAndInstall() {
 	#Set environment variables
 	printf -- "\nSet environment variables . . . \n"
 	if [[ "$ID" == "rhel"  ]] ;then
-		export JAVA_HOME=/usr/lib/jvm/java-1.8.0 
+		export JAVA_HOME=/usr/lib/jvm/java-1.8.0
 	fi
-    		
+
     if [[ "$ID" == "sles"  ]] ;then
 		if [[ "$VERSION_ID" == "12.4" || "$VERSION_ID" == "12.5" ]] ;then
 			export JAVA_HOME=/usr/lib64/jvm/jre-1.8.0-openjdk
 		else
-			export JAVA_HOME=/usr/lib64/jvm/java-1.8.0       
+			export JAVA_HOME=/usr/lib64/jvm/java-1.8.0
 		fi
     fi
-	
-    if [[ "$ID" == "ubuntu"  ]] ;then	
-		export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-s390x		
+
+    if [[ "$ID" == "ubuntu"  ]] ;then
+		export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-s390x
     fi
-		
-	
+
+
 	export PATH=$JAVA_HOME/bin:$PATH
 	printf -- "Java version is :\n"
 	java -version
-	
-	#Install ninja (for SLES 12 SP4, SLES 12 SP4 and RHEL )
+
+	#Install ninja (for SLES 12 SP4, SLES 12 SP5 and RHEL )
 	if [[ "$ID" == "rhel" || "$VERSION_ID" == "12.4"|| "$VERSION_ID" == "12.5" ]]  ;then
-		
+
 		printf -- "\nInstalling ninja . . . \n"
 		cd $SOURCE_ROOT
 		git clone https://github.com/ninja-build/ninja
 		cd ninja
-		git checkout v1.8.2		
+		git checkout v1.8.2
 		./configure.py --bootstrap
-		export PATH=$SOURCE_ROOT/ninja:$PATH		
+		export PATH=$SOURCE_ROOT/ninja:$PATH
 	fi
-	
+
 	#Install maven (for SLES , RHEL  only)
 	if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" || "$ID" == "sles" ]]  ;then
 		printf -- "\nInstalling maven . . . \n"
@@ -107,9 +107,9 @@ function configureAndInstall() {
 		wget http://www.eu.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
 		tar -xvzf apache-maven-3.6.3-bin.tar.gz
 		export PATH=$PATH:$SOURCE_ROOT/apache-maven-3.6.3/bin/
-	
+
 	fi
-	
+
 	#Install GO (for SLES)
 	if [[ "$ID" == "sles" ]]  ;then
 		cd $SOURCE_ROOT
@@ -117,9 +117,9 @@ function configureAndInstall() {
 		tar -xzf go1.13.1.linux-s390x.tar.gz
 		export PATH=$SOURCE_ROOT/go/bin:$PATH
 		export GOROOT=$SOURCE_ROOT/go
-		export GOPATH=$SOURCE_ROOT/go/bin	
+		export GOPATH=$SOURCE_ROOT/go/bin
 	fi
-	
+
 	#Install cmake 3.7 (RHEL 7.x  only)
 	if [[ "$VERSION_ID" == "7.5" || "$VERSION_ID" == "7.6" || "$VERSION_ID" == "7.7" ]]  ;then
 		cd $SOURCE_ROOT
@@ -127,26 +127,26 @@ function configureAndInstall() {
 		tar xzf cmake-3.7.2.tar.gz
 		cd cmake-3.7.2
 		./configure --prefix=/usr/local
-		make && sudo make install	
+		make && sudo make install
 	fi
-	
+
 	#Build netty-tcnative
 	cd $SOURCE_ROOT
 	git clone https://github.com/netty/netty-tcnative.git
 	cd netty-tcnative
 	git checkout netty-tcnative-parent-${PACKAGE_VERSION}.Final
-	
+
 	cd $SOURCE_ROOT/netty-tcnative
 	printf -- "\nApplying  patch . . . \n"
 	# Apply patch
 	sed -i '58,58 s/chromium-stable/patch-s390x-Aug2019/g'    pom.xml
 	sed -i '82,82 s/boringssl.googlesource.com/github.com\/linux-on-ibm-z/g'  boringssl-static/pom.xml
-	mvn install 
-	
+	mvn install
+
 
 	#Cleanup
 
-	printf -- "\n Installation of netty was sucessfull \n\n" 
+	printf -- "\n Installation of netty was sucessfull \n\n"
 }
 
 
