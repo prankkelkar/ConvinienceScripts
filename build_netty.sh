@@ -13,7 +13,7 @@ PACKAGE_NAME="netty-tcnative"
 PACKAGE_VERSION="2.0.30"
 SOURCE_ROOT="$(pwd)"
 USER="$(whoami)"
-PATH_URL="https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/netty-tcnative/2.0.30/patch"
+PATH_URL="https://github.com/prankkelkar/ConvinienceScripts/raw/master/"
 FORCE="false"
 LOG_FILE="${SOURCE_ROOT}/logs/${PACKAGE_NAME}-${PACKAGE_VERSION}-$(date +"%F-%T").log"
 
