@@ -134,7 +134,7 @@ function configureAndInstall() {
 	cd $SOURCE_ROOT
 	git clone https://github.com/netty/netty-tcnative.git
 	cd netty-tcnative
-	git checkout netty-tcnative-parent-${PACKAGE_VERSION}.Final
+	#git checkout netty-tcnative-parent-${PACKAGE_VERSION}.Final
 
 	cd $SOURCE_ROOT/netty-tcnative
 	printf -- "\nApplying  patch . . . \n"
