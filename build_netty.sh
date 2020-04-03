@@ -13,7 +13,7 @@ PACKAGE_NAME="netty-tcnative"
 PACKAGE_VERSION="2.0.30"
 SOURCE_ROOT="$(pwd)"
 USER="$(whoami)"
-
+PATH_URL="https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/netty-tcnative/2.0.30/patch"
 FORCE="false"
 LOG_FILE="${SOURCE_ROOT}/logs/${PACKAGE_NAME}-${PACKAGE_VERSION}-$(date +"%F-%T").log"
 
@@ -134,13 +134,15 @@ function configureAndInstall() {
 	cd $SOURCE_ROOT
 	git clone https://github.com/netty/netty-tcnative.git
 	cd netty-tcnative
-	#git checkout netty-tcnative-parent-${PACKAGE_VERSION}.Final
+	git checkout netty-tcnative-parent-${PACKAGE_VERSION}.Final
 
 	cd $SOURCE_ROOT/netty-tcnative
 	printf -- "\nApplying  patch . . . \n"
 	# Apply patch
 	sed -i '58,58 s/chromium-stable/patch-s390x-Aug2019/g'    pom.xml
 	sed -i '82,82 s/boringssl.googlesource.com/github.com\/linux-on-ibm-z/g'  boringssl-static/pom.xml
+	wget $PATH_URL/pom.xml.patch
+ 	patch -l pom.xml pom.xml.patch
 	mvn install
 
 
