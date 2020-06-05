@@ -90,7 +90,7 @@ function setup_java() {
         if [[ "$ID" == "rhel" ]]; then
             sudo yum install -y java-1.8.0-openjdk-devel.s390x
         elif [[ "$ID" == "sles" ]]; then
-            sudo zypper install java-1_8_0-openjdk-devel
+            sudo zypper install -y java-1_8_0-openjdk-devel
         else # Ubuntu
             sudo apt-get install -y openjdk-8-jre openjdk-8-jdk
         fi
