@@ -205,7 +205,7 @@ function configureAndInstall() {
     git clone -b 4.2.2 https://github.com/java-native-access/jna.git
 
     cd "$CURDIR"/jna
-    ant
+    ant -Dmaven.test.skip=true
 
     rm "$CURDIR/cassandra/lib/jna-4.2.2.jar"
     cp build/jna.jar "$CURDIR/cassandra/lib/jna-4.2.2.jar"
