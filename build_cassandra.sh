@@ -189,8 +189,9 @@ function configureAndInstall() {
 
     # Build Apache Cassandra
     cd "$CURDIR/cassandra"
+    set +e +o pipefail
     ant
-
+    set -e -o pipefail
     printf -- 'Build Apache Cassandra success \n' >>"$LOG_FILE"
 
     # Replace Snappy-Java
