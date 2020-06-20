@@ -1,5 +1,5 @@
 #!/bin/bash
-# © Copyright IBM Corporation 2019, 2020
+# © Copyright IBM Corporation 2020
 # LICENSE: Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
 #
 # Instructions:
@@ -12,14 +12,14 @@ PACKAGE_NAME="cassandra"
 PACKAGE_VERSION="3.11.6"
 CURDIR="$(pwd)"
 USER="$(whoami)"
-PATCH_URL="https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/ApacheCassandra/3.11.5/patch"
+PATCH_URL="https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/ApacheCassandra/3.11.6/patch"
 
 FORCE="false"
 TESTS="false"
 LOG_FILE="$CURDIR/logs/${PACKAGE_NAME}-${PACKAGE_VERSION}-$(date +"%F-%T").log"
 
 JAVA_PROVIDED="adoptjdk"
-BUILD_ENV=setenv.sh
+BUILD_ENV="$CURDIR/setenv.sh"
 
 trap cleanup 0 1 2 ERR
 
@@ -77,7 +77,7 @@ function setup_java() {
         # Install AdoptOpenJDK 8 (With Hotspot)
         cd "$CURDIR"
         export JAVA_HOME=/opt/jdk
-        echo 'export JAVA_HOME=/opt/jdk' >>"$HOME"/"$BUILD_ENV"
+        echo 'export JAVA_HOME=/opt/jdk' >>"$BUILD_ENV"
         sudo mkdir -p $JAVA_HOME
         curl -SL -o jdk.tar.gz https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u202-b08/OpenJDK8U-jdk_s390x_linux_hotspot_8u202b08.tar.gz
         sudo tar -xzf jdk.tar.gz -C $JAVA_HOME --strip-components=1
@@ -96,18 +96,24 @@ function setup_java() {
         fi
 
         export JAVA_HOME="$(readlink -f /etc/alternatives/javac | sed 's:/bin/javac::')"
-        echo "export JAVA_HOME=$JAVA_HOME" >>"$HOME"/"$BUILD_ENV"
+        echo "export JAVA_HOME=$JAVA_HOME" >>"$BUILD_ENV"
         printf -- "export JAVA_HOME=$JAVA_HOME for $ID  \n" >>"$LOG_FILE"
 
     fi
 
     export PATH=$JAVA_HOME/bin:$PATH
-    echo 'export PATH=$JAVA_HOME/bin:$PATH' >>"$HOME"/"$BUILD_ENV"
+    echo 'export PATH=$JAVA_HOME/bin:$PATH' >>"$BUILD_ENV"
 }
 
 function cleanup() {
     # Remove artifacts
+    rm -rf "${CURDIR}/jdk.tar.gz"
     rm -rf "${CURDIR}/jna"
+    rm -rf "${CURDIR}/ant.tar.gz"
+    rm -rf "${CURDIR}/libffi-3.2.1.tar.gz"
+    rm -rf "${CURDIR}/build.xml.diff"
+    rm -rf "${CURDIR}/jvm.options.diff"
+    rm -rf "${CURDIR}/cassandra.yaml.diff"
 
     printf -- "Cleaned up the artifacts\n" >>"$LOG_FILE"
 }
@@ -120,20 +126,21 @@ function configureAndInstall() {
     DISTRO="$ID-$VERSION_ID"
     if [[ "$DISTRO" == "rhel-8.2" || "$DISTRO" == "rhel-8.1" ]]; then
         export ANT_HOME=/opt/ant
-        echo 'export ANT_HOME=/opt/ant' >>"$HOME"/"$BUILD_ENV"
+        echo 'export ANT_HOME=/opt/ant' >>"$BUILD_ENV"
         sudo mkdir -p "$ANT_HOME"
 
         curl -SL -o ant.tar.gz https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.4-bin.tar.gz
         sudo tar -xvf ant.tar.gz -C "$ANT_HOME" --strip-components=1
 
         export PATH=$ANT_HOME/bin:$PATH
-        echo 'export PATH=$ANT_HOME/bin:$PATH' >>"$HOME"/"$BUILD_ENV"
+        echo 'export PATH=$ANT_HOME/bin:$PATH' >>"$BUILD_ENV"
     fi
     printf -- "Install Ant success\n" >>"$LOG_FILE"
 
     #Install libffi to resolve missing libffi.so.6 library issue.
     printf -- "Install libffi library\n" >>"$LOG_FILE"
-    if [[ "$DISTRO" == "ubuntu-20.04" || "$ID" == "sles" ]]; then
+    if [[ "$DISTRO" == "ubuntu-20.04" || "$ID" == "sles" ]]; then        
+        cd "$CURDIR"
         wget ftp://sourceware.org/pub/libffi/libffi-3.2.1.tar.gz
         tar xvfz libffi-3.2.1.tar.gz
         cd libffi-3.2.1
@@ -142,10 +149,10 @@ function configureAndInstall() {
         sudo make install
         if [[ "$DISTRO" == "ubuntu-20.04" ]]; then
             export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-            echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >>"$HOME"/"$BUILD_ENV"
+            echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >>"$BUILD_ENV"
         else
             export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH
-            echo 'export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH' >>"$HOME"/"$BUILD_ENV"
+            echo 'export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH' >>"$BUILD_ENV"
         fi    
     fi
 
@@ -154,13 +161,13 @@ function configureAndInstall() {
     setup_java
 
     export LANG="en_US.UTF-8"
-    echo 'export LANG="en_US.UTF-8"' >>"$HOME"/"$BUILD_ENV"
+    echo 'export LANG="en_US.UTF-8"' >>"$BUILD_ENV"
 
     export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"
-    echo 'export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"' >>"$HOME"/"$BUILD_ENV"
+    echo 'export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"' >>"$BUILD_ENV"
 
     export ANT_OPTS="-Xms4G -Xmx4G"
-    echo 'export ANT_OPTS="-Xms4G -Xmx4G"' >>"$HOME"/"$BUILD_ENV"
+    echo 'export ANT_OPTS="-Xms4G -Xmx4G"' >>"$BUILD_ENV"
 
     java -version
 
@@ -315,11 +322,11 @@ case "$DISTRO" in
 "rhel-8.2" | "rhel-8.1")
     printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
     printf -- "Installing dependencies... it may take some time.\n"
-    sudo yum install -y langpacks-en_GB.noarch curl git which gcc-c++ make automake autoconf libtool libstdc++-static tar wget patch words libXt-devel libX11-devel texinfo unzip python2 |& tee -a "$LOG_FILE"
+    sudo yum install -y langpacks-en_GB.noarch curl git which gcc-c++ make automake autoconf libtool libstdc++-static tar wget patch words libXt-devel libX11-devel texinfo unzip python3-devel python3-setuptools |& tee -a "$LOG_FILE"
     configureAndInstall |& tee -a "$LOG_FILE"
     ;;
 
-"sles-12.4" | "sles-12.5")
+"sles-12.5")
     printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
     printf -- "Installing dependencies... it may take some time.\n"
     sudo zypper install -y ant ant-junit junit curl git which make wget tar zip unzip words gcc-c++ patch libtool automake autoconf ccache xorg-x11-proto-devel xorg-x11-devel alsa-devel cups-devel libffi48-devel libstdc++6-locale glibc-locale libstdc++-devel libXt-devel libX11-devel texinfo python |& tee -a "$LOG_FILE"
