@@ -12,7 +12,7 @@ PACKAGE_NAME="cassandra"
 PACKAGE_VERSION="3.11.6"
 CURDIR="$(pwd)"
 USER="$(whoami)"
-PATCH_URL="https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/ApacheCassandra/3.11.6/patch"
+PATCH_URL="https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/ApacheCassandra/3.11.5/patch"
 
 FORCE="false"
 TESTS="false"
