@@ -212,9 +212,7 @@ function configureAndInstall() {
     git clone -b 4.2.2 https://github.com/java-native-access/jna.git
 
     cd "$CURDIR"/jna
-    set +e +o pipefail
-    ant
-    set -e -o pipefail
+    ant native jar
     rm "$CURDIR/cassandra/lib/jna-4.2.2.jar"
     cp build/jna.jar "$CURDIR/cassandra/lib/jna-4.2.2.jar"
 
@@ -346,3 +344,4 @@ case "$DISTRO" in
 esac
 
 gettingStarted |& tee -a "$LOG_FILE"
+
