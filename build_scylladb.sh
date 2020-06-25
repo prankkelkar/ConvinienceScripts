@@ -10,7 +10,7 @@
 set -e -o pipefail
 
 PACKAGE_NAME="ScyllaDB"
-PACKAGE_VERSION="4.0.2"
+PACKAGE_VERSION="4.0.3"
 SOURCE_ROOT="$(pwd)"
 
 FORCE="false"
