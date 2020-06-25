@@ -193,7 +193,7 @@ configureAndInstall()
   git submodule update --init --recursive
 
   curl -sSL ${PATCH_URL}/seastar.diff | patch -d seastar -p1 || error "seastar.diff"
-  curl -sSL ${PATCH_URL}/scylla.diff | patch -p1 || error "scylla.diff"
+  curl -sSL https://raw.githubusercontent.com/prankkelkar/ConvinienceScripts/master/scylla.diff | patch -p1 || error "scylla.diff"
 
   msg "Building scylla"
 
