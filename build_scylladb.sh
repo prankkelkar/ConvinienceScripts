@@ -194,6 +194,7 @@ configureAndInstall()
 
   curl -sSL ${PATCH_URL}/seastar.diff | patch -d seastar -p1 || error "seastar.diff"
   curl -sSL https://raw.githubusercontent.com/prankkelkar/ConvinienceScripts/master/scylla.diff | patch -p1 || error "scylla.diff"
+  sed -i 's/#warning.*/asm(".cfi_undefined r14");/g' $SOURCE_ROOT/scylla/seastar/src/core/thread.cc
 
   msg "Building scylla"
 
