@@ -643,7 +643,7 @@ case "$DISTRO" in
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # C/C++ environment settings
-
+  export LC_ALL=C
   export PATH=${PREFIX}/bin${PATH:+:${PATH}}
 
   LD_LIBRARY_PATH=${PREFIX}/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
@@ -659,7 +659,7 @@ case "$DISTRO" in
   export CC=/usr/bin/gcc-8
   export CXX=/usr/bin/g++-8
 
-  CENV=(PATH=$PATH LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+  CENV=(LC_ALL=$LC_ALL PATH=$PATH LD_LIBRARY_PATH=$LD_LIBRARY_PATH
         LD_RUN_PATH=$LD_RUN_PATH
         CC=$CC CXX=$CXX
         )
