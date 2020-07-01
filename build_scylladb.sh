@@ -644,6 +644,7 @@ case "$DISTRO" in
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # C/C++ environment settings
   export LC_ALL=C
+  unset LANGUAGE
   export PATH=${PREFIX}/bin${PATH:+:${PATH}}
 
   LD_LIBRARY_PATH=${PREFIX}/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
