@@ -437,7 +437,7 @@ buildRHEL()
 
 #----------------------------------------------------------
   msg "Installing pyparsing, colorama, pyyaml"
-  pip3 install --user pyparsing colorama pyyaml
+  pip3 install --user pyparsing colorama pyyaml cassandra-driver boto3 requests
 
 #----------------------------------------------------------
   msg "Building ninja-${NINJA_VERSION}"
@@ -580,6 +580,7 @@ case "$DISTRO" in
 
 # C/C++ environment settings
   export PATH=${PREFIX}/bin${PATH:+:${PATH}}
+  export PATH=$PATH:~/.local/bin/
 
   LD_LIBRARY_PATH=${PREFIX}/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
   LD_LIBRARY_PATH+=:${PREFIX}/lib
@@ -612,7 +613,7 @@ case "$DISTRO" in
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   msglog "Installing pyparsing, colorama, pyyaml"
-  pip3 install --user pyparsing colorama pyyaml
+  pip3 install --user pyparsing colorama pyyaml cassandra-driver boto3 requests
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   buildCmake |& tee -a "$LOG_FILE"
@@ -645,6 +646,7 @@ case "$DISTRO" in
 # C/C++ environment settings
   export LC_ALL=C
   unset LANGUAGE
+  export PATH=$PATH:~/.local/bin/
   export PATH=${PREFIX}/bin${PATH:+:${PATH}}
 
   LD_LIBRARY_PATH=${PREFIX}/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
@@ -676,7 +678,7 @@ case "$DISTRO" in
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   msglog "Installing pyparsing, colorama, pyyaml"
-  pip3 install --user pyparsing colorama pyyaml
+  pip3 install --user pyparsing colorama pyyaml cassandra-driver boto3 requests
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   buildCmake |& tee -a "$LOG_FILE"
