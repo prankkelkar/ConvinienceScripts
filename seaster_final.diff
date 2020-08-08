@@ -1,4 +1,3 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 8723574..545332a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
@@ -32,21 +31,6 @@ index fde1785..83dd7c1 100644
          if (_server._credentials) {
              req->protocol_name = "https";
          }
-     asm(".cfi_undefined x30");
- #else
--    #warning "Backtracing from seastar threads may be broken"
-+    asm(".cfi_undefined r14");
- #endif
-     _context.initial_switch_in_completed();
-     if (group() != current_scheduling_group()) {
-diff --git a/src/http/httpd.cc b/src/http/httpd.cc
-index fde1785..83dd7c1 100644
---- a/src/http/httpd.cc
-+++ b/src/http/httpd.cc
-@@ -224,16 +224,14 @@ future<> connection::read_one() {
-         if (_server._credentials) {
-             req->protocol_name = "https";
-         }
 -
          size_t content_length_limit = _server.get_content_length_limit();
          sstring length_header = req->get_header("Content-Length");
@@ -63,7 +47,6 @@ index fde1785..83dd7c1 100644
          }
          return read_request_body(_read_buf, std::move(req)).then([this] (std::unique_ptr<httpd::request> req) {
              return _replies.not_full().then([req = std::move(req), this] () mutable {
-diff --git a/src/net/dns.cc b/src/net/dns.cc
 diff --git a/src/net/dns.cc b/src/net/dns.cc
 index fa1ea87..f4fe7f3 100644
 --- a/src/net/dns.cc
